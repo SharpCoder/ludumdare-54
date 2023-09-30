@@ -143,7 +143,6 @@ export function createRoom(def: RoomDef) {
 
     const brick_w = (def.w / 128) * 1.5;
     const brick_h = (def.h / 128) * 1.5;
-
     // Add a floor
     const floor: Drawable = {
         name: `floor_${def.w}_${def.h}`,
@@ -154,21 +153,54 @@ export function createRoom(def: RoomDef) {
         texture: {
             repeat_horizontal: 'repeat',
             repeat_vertical: 'repeat',
-            uri: './assets/floor-tile.png',
+            uri: './assets/ceiling.png',
             enabled: true,
         },
         texcoords: Flatten(Repeat(tex2D(brick_w, brick_h), 6)),
     };
 
+    // Add a ceiling
+    const ceiling: Drawable = {
+        name: `floor_${def.w}_${def.h}`,
+        vertexes: cuboid(def.w, 1, def.h),
+        offsets: [-def.w, def.ceiling, 0],
+        position: [0, 0, 0],
+        rotation: zeros(),
+        texture: {
+            repeat_horizontal: 'repeat',
+            repeat_vertical: 'repeat',
+            uri: './assets/ceiling.png',
+            enabled: true,
+        },
+        texcoords: Flatten(Repeat(tex2D(brick_w, brick_h), 6)),
+    };
+
+    // Add a roof
+    const roof: Drawable = {
+        name: 'roof',
+        vertexes: cuboid(def.w, 50, def.h),
+        offsets: [-def.w, def.ceiling, 0],
+        position: zeros(),
+        rotation: zeros(),
+        colors: Flatten(Repeat([28, 28, 28], 36)),
+    };
+
+    container.children?.push(roof);
     container.children?.push(floor);
+    container.children?.push(ceiling);
 
     return container;
 }
 
-export function loadMap(map: number[][]) {
-    const ROOM_DEPTH = 1000;
-    const ROOM_WIDTH = 1000;
+export type MapProps = {
+    x: number;
+    z: number;
+};
+export function loadMap(props: MapProps, map: number[][]) {
+    const ROOM_DEPTH = 2000;
+    const ROOM_WIDTH = 2000;
     const roomList = [];
+    let first = true;
 
     for (let y = 0; y < map.length; y++) {
         for (let x = 0; x < map[y].length; x++) {
@@ -179,7 +211,7 @@ export function loadMap(map: number[][]) {
             const E = map[y]?.[x - 1] == 1;
             const W = map[y]?.[x + 1] == 1;
 
-            if (N) doorways.push('N');
+            if (N || first) doorways.push('N');
             if (S) doorways.push('S');
             if (E) doorways.push('E');
             if (W) doorways.push('W');
@@ -187,15 +219,17 @@ export function loadMap(map: number[][]) {
             if (Current)
                 roomList.push(
                     createRoom({
-                        x: x * ROOM_WIDTH,
-                        z: y * ROOM_DEPTH,
+                        x: props.x + x * ROOM_WIDTH,
+                        z: props.z + y * ROOM_DEPTH,
                         h: ROOM_WIDTH,
                         w: ROOM_DEPTH,
-                        ceiling: 1600,
-                        doorWidth: 500 - 25 * y,
+                        ceiling: 600,
+                        doorWidth: 450,
                         doorways: doorways,
                     })
                 );
+
+            first = false;
         }
     }
 

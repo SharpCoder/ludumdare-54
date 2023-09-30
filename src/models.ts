@@ -1,6 +1,12 @@
 import { loadModel, type Drawable, type ParsedModel } from 'webgl-engine';
 
-const assetList = ['./assets/table.obj', './assets/paper.obj'];
+const assetList = [
+    './assets/table.obj',
+    './assets/paper.obj',
+    './assets/keypad.obj',
+    './assets/tree.obj',
+    './assets/pillar.obj',
+];
 const models: Record<string, ParsedModel> = {};
 
 function fileName(path: string): string {

@@ -1,8 +1,9 @@
 import { Scene } from 'webgl-engine';
 import { useMouse } from '../hooks/useMouse';
-import { loadMap } from '../map';
+import { loadMap, type RoomDef } from '../map';
 import { DefaultShader } from '../shaders/default';
 import { spawnClue } from '../objects/clue';
+import { spawnKeypad } from '../objects/keypad';
 
 export const SandboxScene = new Scene<unknown>({
     title: 'Sandbox Scene',
@@ -25,7 +26,7 @@ export const SandboxScene = new Scene<unknown>({
         ];
 
         // Populate the map
-        const roomList = loadMap(map);
+        const roomList = loadMap({ x: 0, z: 0 }, map);
         for (const room of roomList) {
             SandboxScene.addObject(room);
         }
@@ -34,25 +35,32 @@ export const SandboxScene = new Scene<unknown>({
         const firstRoom = roomList[0];
         SandboxScene.camera.position = [...firstRoom.position];
 
-        const { def } = firstRoom.properties as any;
+        const { def } = firstRoom.properties as { def: RoomDef };
         if (def) {
             const clue = spawnClue({
                 x: firstRoom.position[0],
-                z: firstRoom.position[2] - 400,
-                text: 'The password is uryyb',
+                z: firstRoom.position[2] - 900,
+                text: 'uryyb',
             });
 
             SandboxScene.addObject(clue);
+
+            // Add the keypad
+            const keypad = spawnKeypad({
+                x: firstRoom.position[0] + def.w / 2,
+                z: firstRoom.position[2] - def.h / 6,
+            });
+
+            keypad.offsets[1] = 300;
+            SandboxScene.addObject(keypad);
         }
     },
     update: (time, engine) => {
+        const { gl } = engine;
         useMouse(engine);
     },
     init: (engine) => {
-        const { gl } = engine;
         engine.settings.fogColor = [0, 0, 0, 1];
-        gl.blendFunc(gl.SRC_COLOR, gl.SRC_ALPHA_SATURATE);
-        // gl.blendFunc(gl.CONSTANT_COLOR, gl.DST_COLOR);
 
         const { camera } = SandboxScene;
         camera.setY(-250);

@@ -1,4 +1,4 @@
-import { type bbox, type Drawable, m4 } from 'webgl-engine';
+import { type bbox, type Drawable, m4, Engine } from 'webgl-engine';
 
 export function computePositionMatrix(obj: Drawable): number[] {
     // Calculate the position of all the vertexes for
@@ -108,4 +108,16 @@ export function computeDimensions(vertexes: number[]) {
     const depth = max[2] - min[2];
 
     return [width, height, depth];
+}
+
+export function distanceToCamera(
+    engine: Engine<unknown>,
+    x: number,
+    z: number
+) {
+    const { camera } = engine.activeScene;
+    return Math.sqrt(
+        Math.pow(camera.position[0] - x, 2) +
+            Math.pow(camera.position[2] - z, 2)
+    );
 }

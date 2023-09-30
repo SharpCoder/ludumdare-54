@@ -157,7 +157,13 @@ export const DefaultShader: ProgramTemplate = {
                         repeatMap[obj.texture.repeat_vertical] ??
                             gl.CLAMP_TO_EDGE
                     );
+                    gl.uniform1i(loc, 0);
+                    gl.activeTexture(gl.TEXTURE0);
+                    gl.bindTexture(gl.TEXTURE_2D, webglTexture);
                 } else {
+                    gl.uniform1i(loc, 1);
+                    gl.activeTexture(gl.TEXTURE1);
+                    gl.bindTexture(gl.TEXTURE_2D, webglTexture);
                     gl.texParameteri(
                         gl.TEXTURE_2D,
                         gl.TEXTURE_WRAP_S,
@@ -176,9 +182,9 @@ export const DefaultShader: ProgramTemplate = {
 
                 // This ensures the image is loaded into
                 // u_texture properly.
-                gl.uniform1i(loc, 0);
-                gl.activeTexture(gl.TEXTURE0);
-                gl.bindTexture(gl.TEXTURE_2D, webglTexture);
+                // gl.uniform1i(loc, 0);
+                // gl.activeTexture(gl.TEXTURE0);
+                // gl.bindTexture(gl.TEXTURE_2D, webglTexture);
             }
         },
         u_transparent: (engine, loc, obj) => {

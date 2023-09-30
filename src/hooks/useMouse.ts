@@ -4,14 +4,17 @@ import {
     type Sphere,
     sphereRectCollision,
 } from 'webgl-engine';
+import type { GameProps } from '../main';
 
 const MAX_VEL = 12.0;
 let vx = 0.0,
     vy = 0.0;
 
-export function useMouse(engine: Engine<unknown>) {
+export function useMouse(engine: Engine<GameProps>) {
     const { gl } = engine;
     const { camera } = engine.activeScene;
+
+    if (engine.properties.activePuzzle !== 'none') return;
 
     // Calculate camera details
     const hx = gl.canvas.width / 2;

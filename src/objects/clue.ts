@@ -1,6 +1,7 @@
 import { rads, zeros, type Drawable } from 'webgl-engine';
-import { computeDimensions } from '../math';
+import { computeDimensions, distanceToCamera } from '../math';
 import { getModel } from '../models';
+import { removeText, updateText } from '../utils';
 
 export type ClueDef = {
     text: string;
@@ -41,20 +42,14 @@ export function spawnClue(def: ClueDef) {
         offsets: [-paperW / 2, -paperH / 2, -paperD / 2],
         scale: [25, 25, 25],
         update: function (time, engine) {
-            const { camera } = engine.activeScene;
             // Calculate distance
-            const dist = Math.sqrt(
-                Math.pow(camera.position[0] - def.x, 2) +
-                    Math.pow(camera.position[2] - def.z, 2)
-            );
+            const dist = distanceToCamera(engine, def.x, def.z);
 
             if (dist < 300) {
-                // @ts-ignore
-                engine.properties['clueText'] = def.text;
+                updateText(engine, def.text);
                 // @ts-ignore
             } else if (engine.properties['clueText'] === def.text) {
-                // @ts-ignore
-                engine.properties['clueText'] = '';
+                removeText(engine, def.text);
             }
         },
     });

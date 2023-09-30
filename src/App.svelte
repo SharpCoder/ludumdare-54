@@ -1,5 +1,7 @@
 <script lang="ts">
     import type { Engine } from 'webgl-engine';
+    import type { ActivePuzzle, GameProps } from './main';
+    import Keypad from './components/Keypad.svelte';
 
     let webglCanvas: HTMLCanvasElement;
     let initialized = false;
@@ -7,11 +9,13 @@
 
     let clueText = '';
     let clueVisible = false;
+
+    let activePuzzle: ActivePuzzle = 'none';
     let timerId = -1;
 
     $: {
         // @ts-ignore
-        const engine: Engine<unknown> = window['gameEngine'];
+        const engine: Engine<GameProps> = window['gameEngine'];
         engine.onReadyChange = (readyState) => {
             if (readyState === 'ready') {
                 ready = true;
@@ -29,6 +33,9 @@
             } else {
                 clueVisible = false;
             }
+
+            // Update active puzzle
+            activePuzzle = engine.properties.activePuzzle ?? 'none';
         }, 100);
 
         if (webglCanvas && !initialized) {
@@ -47,6 +54,10 @@
 
 {#if clueVisible}
     <div id="clue"><div class="clue-text">{clueText}</div></div>
+{/if}
+
+{#if activePuzzle === 'keypad'}
+    <Keypad />
 {/if}
 
 <style>
