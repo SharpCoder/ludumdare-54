@@ -42,9 +42,9 @@ const colors = [
 ];
 
 const segments = [
-    { w: 1500, gap: 200, r: 0 },
-    { w: 1500, r: 90 },
-    { w: 1500, r: 90 },
+    { w: 1500, gap: 250, r: 0 },
+    { w: 1500, gap: 150, r: 90 },
+    { w: 1500, gap: 150, r: 90 },
     { w: 1500, r: 90 },
 ];
 
@@ -66,7 +66,7 @@ function room(w: number, h: number) {
 
     for (const segment of segments) {
         r += segment.r;
-        const node: Drawable = {
+        const fakeWall: Drawable = {
             name: uuidv4(),
             colors: Flatten(Repeat(colors[idx], 36)),
             vertexes: cuboid(segment.w, 450, 1),
@@ -75,14 +75,35 @@ function room(w: number, h: number) {
             rotation: [0, rads(r), 0],
         };
 
-        const bbox = computeBbox(node);
+        // Compute the children.
+        if (segment.gap) {
+            const left: Drawable = {
+                name: uuidv4(),
+                colors: Flatten(Repeat(colors[idx], 36)),
+                vertexes: cuboid((segment.w - segment.gap) / 2, 450, 1),
+                offsets: [-segment.w, 0, 0],
+                position: [x, y, z],
+                rotation: [0, rads(r), 0],
+            };
+            const right: Drawable = {
+                name: uuidv4(),
+                colors: Flatten(Repeat(colors[idx], 36)),
+                vertexes: cuboid((segment.w - segment.gap) / 2, 450, 1),
+                offsets: [-(segment.w - segment.gap) / 2, 0, 0],
+                position: [x, y, z],
+                rotation: [0, rads(r), 0],
+            };
+
+            container.children?.push(left);
+            container.children?.push(right);
+        } else {
+            container.children?.push(fakeWall);
+        }
+
+        const bbox = computeBbox(fakeWall);
         x = bbox.x - bbox.w;
         z = bbox.z - bbox.d;
-
-        console.log(idx, bbox);
         idx += 1;
-
-        container.children?.push(node);
     }
 
     return container;
