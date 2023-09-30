@@ -1,9 +1,31 @@
-import {
-    computePositionMatrix,
-    type bbox,
-    type Drawable,
-    m4,
-} from 'webgl-engine';
+import { type bbox, type Drawable, m4 } from 'webgl-engine';
+
+export function computePositionMatrix(obj: Obj3d): number[] {
+    // Calculate the position of all the vertexes for
+    // this object.
+    const scaleX = obj.scale?.[0] ?? 1.0;
+    const scaleY = obj.scale?.[1] ?? 1.0;
+    const scaleZ = obj.scale?.[2] ?? 1.0;
+
+    // console.log({ scaleX });
+    let positionMatrixes = [
+        m4.translate(obj.position[0], -obj.position[1], -obj.position[2]),
+        m4.rotateX(obj.rotation[0]),
+        m4.rotateY(obj.rotation[1]),
+        m4.rotateZ(obj.rotation[2]),
+    ];
+
+    if (obj.additionalMatrix) {
+        positionMatrixes.push([...obj.additionalMatrix]);
+    }
+
+    positionMatrixes.push(
+        m4.translate(obj.offsets[0], obj.offsets[1], obj.offsets[2])
+    );
+    positionMatrixes.push(m4.scale(scaleX, scaleY, scaleZ));
+
+    return m4.combine(positionMatrixes);
+}
 
 export function computeBbox(obj: Drawable): bbox {
     const positionMatrix = computePositionMatrix(obj);

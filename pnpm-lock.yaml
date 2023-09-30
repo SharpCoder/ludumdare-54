@@ -3,17 +3,19 @@ lockfileVersion: 5.4
 specifiers:
   '@sveltejs/vite-plugin-svelte': ^2.4.2
   '@tsconfig/svelte': ^5.0.0
+  '@types/uuid': ^9.0.4
   svelte: ^4.0.5
   svelte-check: ^3.4.6
   tslib: ^2.6.0
   typescript: ^5.0.2
   uuid: ^9.0.1
   vite: ^4.4.5
-  webgl-engine: ../webgl-engine
+  webgl-engine: git+git@github.com:SharpCoder/webgl-engine.git
 
 dependencies:
+  '@types/uuid': 9.0.4
   uuid: 9.0.1
-  webgl-engine: link:../webgl-engine
+  webgl-engine: github.com/SharpCoder/webgl-engine/ae54ccb8bb5dcc19dbe3172177138180209fb95b
 
 devDependencies:
   '@sveltejs/vite-plugin-svelte': 2.4.6_svelte@4.2.1+vite@4.4.9
@@ -330,6 +332,10 @@ packages:
   /@types/pug/2.0.7:
     resolution: {integrity: sha512-I469DU0UXNC1aHepwirWhu9YKg5fkxohZD95Ey/5A7lovC+Siu+MCLffva87lnfThaOrw9Vb1DUN5t55oULAAw==}
     dev: true
+
+  /@types/uuid/9.0.4:
+    resolution: {integrity: sha512-zAuJWQflfx6dYJM62vna+Sn5aeSWhh3OB+wfUEACNcqUSc0AGc5JKl+ycL1vrH7frGTXhJchYjE1Hak8L819dA==}
+    dev: false
 
   /acorn/8.10.0:
     resolution: {integrity: sha512-F0SAmZ8iUtS//m8DmCTA0jlh6TDKkHQyK6xc6V4KDTyZKA9dnvX9/3sRTVQrWm79glUAZbnmmNcdYwUIHWVybw==}
@@ -979,3 +985,9 @@ packages:
   /wrappy/1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
     dev: true
+
+  github.com/SharpCoder/webgl-engine/ae54ccb8bb5dcc19dbe3172177138180209fb95b:
+    resolution: {tarball: https://codeload.github.com/SharpCoder/webgl-engine/tar.gz/ae54ccb8bb5dcc19dbe3172177138180209fb95b}
+    name: webgl-engine
+    version: 1.0.4
+    dev: false
