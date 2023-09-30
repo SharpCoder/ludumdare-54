@@ -1,29 +1,37 @@
 import './app.css';
 import App from './App.svelte';
 import { Engine } from 'webgl-engine';
-import { DefaultScene } from './scenes/defaultScene';
 import { SandboxScene } from './scenes/sandboxScene';
+import { initializeModels } from './models';
 
 const engine = new Engine();
 
 // @ts-ignore
 window['gameEngine'] = engine;
+engine.setReady('initialize');
 
-// TODO: Manage scenes
-engine.addScene(SandboxScene);
+// Initialize models
+initializeModels().then(() => {
+    // TODO: Manage scenes
+    engine.addScene(SandboxScene);
 
-function draw() {
-    engine.draw();
-    requestAnimationFrame(draw.bind(engine));
-}
+    setTimeout(() => {
+        function draw() {
+            engine.draw();
+            requestAnimationFrame(draw.bind(engine));
+        }
 
-function update() {
-    engine.update();
-    requestAnimationFrame(update.bind(engine));
-}
+        function update() {
+            engine.update();
+            requestAnimationFrame(update.bind(engine));
+        }
 
-draw();
-update();
+        draw();
+        update();
+
+        engine.setReady('ready');
+    }, 500);
+});
 
 const app = new App({
     target: document.getElementById('app') ?? document.createElement('div'),

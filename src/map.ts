@@ -98,7 +98,7 @@ export function createRoom(def: RoomDef) {
         r += segment.r;
         const fakeWall: Drawable = {
             name: `${segment.w}_${segment.gap}_main`,
-            vertexes: cuboid(segment.w, def.ceiling, 1),
+            vertexes: cuboid(segment.w, def.ceiling, 0),
             offsets: [-segment.w, 0, 0],
             position: [x, y, z],
             rotation: [0, rads(r), 0],
@@ -187,8 +187,8 @@ export function loadMap(map: number[][]) {
                     createRoom({
                         x: x * ROOM_WIDTH,
                         z: y * ROOM_DEPTH,
-                        h: ROOM_WIDTH - 2,
-                        w: ROOM_DEPTH - 2,
+                        h: ROOM_WIDTH,
+                        w: ROOM_DEPTH,
                         ceiling: 1600,
                         doorWidth: 500 - 25 * y,
                         doorways: doorways,

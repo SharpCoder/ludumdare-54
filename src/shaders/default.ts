@@ -144,7 +144,7 @@ export const DefaultShader: ProgramTemplate = {
             // Check if the current texture is loaded
             if (obj && obj.texture && obj.texture.enabled !== false) {
                 const { webglTexture, square } = obj.texture._computed;
-                if (obj.texture._computed) {
+                if (obj.texture._computed && square) {
                     gl.texParameteri(
                         gl.TEXTURE_2D,
                         gl.TEXTURE_WRAP_S,
@@ -157,11 +157,22 @@ export const DefaultShader: ProgramTemplate = {
                         repeatMap[obj.texture.repeat_vertical] ??
                             gl.CLAMP_TO_EDGE
                     );
+                } else {
+                    gl.texParameteri(
+                        gl.TEXTURE_2D,
+                        gl.TEXTURE_WRAP_S,
+                        gl.CLAMP_TO_EDGE
+                    );
+                    gl.texParameteri(
+                        gl.TEXTURE_2D,
+                        gl.TEXTURE_WRAP_T,
+                        gl.CLAMP_TO_EDGE
+                    );
                 }
 
-                // if (square) {
-                //     gl.generateMipmap(gl.TEXTURE_2D);
-                // }
+                if (square) {
+                    // gl.generateMipmap(gl.TEXTURE_2D);
+                }
 
                 // This ensures the image is loaded into
                 // u_texture properly.
