@@ -6,8 +6,11 @@ import {
     rads,
     Flatten,
     Repeat,
+    Repeat2D,
 } from 'webgl-engine';
 import { computeBbox } from './math';
+import { rect2D } from 'webgl-engine';
+import { tex2D } from 'webgl-engine';
 
 export type Doorway = 'N' | 'S' | 'E' | 'W';
 export type RoomDef = {
@@ -69,36 +72,54 @@ export function createRoom(def: RoomDef) {
     ];
 
     for (const segment of segments) {
+        const texcoord_w = segment.w / 128;
+        const texcoord_h = (def.ceiling / 128) * 1.5;
+
+        const wallSegment: Partial<Drawable> = {
+            colors: Flatten(Repeat(colors[idx % (colors.length - 1)], 36)),
+            computeBbox: true,
+            texture: {
+                repeat_horizontal: 'mirrored_repeat',
+                repeat_vertical: 'mirrored_repeat',
+                uri: './assets/brick.png',
+                enabled: true,
+            },
+        };
+
         r += segment.r;
         const fakeWall: Drawable = {
             name: uuidv4(),
-            vertexes: cuboid(segment.w, 450, 1),
-            colors: Flatten(Repeat(colors[idx % (colors.length - 1)], 36)),
+            vertexes: cuboid(segment.w, def.ceiling, 1),
             offsets: [-segment.w, 0, 0],
             position: [x, y, z],
             rotation: [0, rads(r), 0],
-            computeBbox: true,
+            ...wallSegment,
+            texcoords: Flatten(Repeat(tex2D(texcoord_w, texcoord_h), 6)),
         };
 
         // Compute the children.
         if (segment.gap) {
             const left: Drawable = {
                 name: uuidv4(),
-                colors: Flatten(Repeat(colors[idx % (colors.length - 1)], 36)),
-                vertexes: cuboid((segment.w - segment.gap) / 2, 450, 1),
+                vertexes: cuboid((segment.w - segment.gap) / 2, def.ceiling, 1),
                 offsets: [-segment.w, 0, 0],
                 position: [x, y, z],
                 rotation: [0, rads(r), 0],
-                computeBbox: true,
+                ...wallSegment,
+                texcoords: Flatten(
+                    Repeat(tex2D(texcoord_w / 2, texcoord_h), 6)
+                ),
             };
             const right: Drawable = {
                 name: uuidv4(),
-                colors: Flatten(Repeat(colors[idx % (colors.length - 1)], 36)),
-                vertexes: cuboid((segment.w - segment.gap) / 2, 450, 1),
+                vertexes: cuboid((segment.w - segment.gap) / 2, def.ceiling, 1),
                 offsets: [-(segment.w - segment.gap) / 2, 0, 0],
                 position: [x, y, z],
                 rotation: [0, rads(r), 0],
-                computeBbox: true,
+                ...wallSegment,
+                texcoords: Flatten(
+                    Repeat(tex2D(texcoord_w / 2, texcoord_h), 6)
+                ),
             };
 
             container.children?.push(left);

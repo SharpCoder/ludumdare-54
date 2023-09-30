@@ -10,9 +10,9 @@ export const SandboxScene = new Scene<unknown>({
         useMouse(engine);
     },
     init: (engine) => {
-        engine.settings.fogColor = [1, 1, 1, 1];
+        engine.settings.fogColor = [0.2, 0.2, 0.2, 1];
         const { camera } = SandboxScene;
-        camera.setY(-50);
+        camera.setY(-150);
     },
     status: 'initializing',
 });
@@ -20,8 +20,8 @@ export const SandboxScene = new Scene<unknown>({
 const MainRoom: RoomDef = {
     w: 1500,
     h: 1500,
-    ceiling: 800,
-    doorWidth: 250,
+    ceiling: 1600,
+    doorWidth: 500,
     doorways: ['S'],
 };
 
