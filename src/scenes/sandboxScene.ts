@@ -1,6 +1,7 @@
-import { DefaultShader, Scene } from 'webgl-engine';
+import { Scene } from 'webgl-engine';
 import { useMouse } from '../hooks/useMouse';
 import { createRoom, type RoomDef } from '../map';
+import { DefaultShader } from '../shaders/default';
 
 export const SandboxScene = new Scene<unknown>({
     title: 'Sandbox Scene',
@@ -10,7 +11,10 @@ export const SandboxScene = new Scene<unknown>({
         useMouse(engine);
     },
     init: (engine) => {
-        engine.settings.fogColor = [0.2, 0.2, 0.2, 1];
+        const { gl } = engine;
+        engine.settings.fogColor = [0, 0, 0, 1];
+        gl.blendFunc(gl.SRC_ALPHA, gl.DST_COLOR);
+
         const { camera } = SandboxScene;
         camera.setY(-150);
     },

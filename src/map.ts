@@ -137,16 +137,6 @@ export function createRoom(def: RoomDef) {
     const brick_w = (def.w / 128) * 1.5;
     const brick_h = (def.h / 128) * 1.5;
 
-    // Add a ceiling
-    const ceiling: Drawable = {
-        name: `ceiling_${def.w}_${def.h}`,
-        vertexes: cuboid(def.w, 1, def.h),
-        colors: Flatten(Repeat([28, 28, 28], 36)),
-        offsets: [-def.w, def.ceiling, 0],
-        position: [0, 0, 0],
-        rotation: zeros(),
-    };
-
     // Add a floor
     const floor: Drawable = {
         name: `floor_${def.w}_${def.h}`,
@@ -163,7 +153,6 @@ export function createRoom(def: RoomDef) {
         texcoords: Flatten(Repeat(tex2D(brick_w, brick_h), 6)),
     };
 
-    container.children?.push(ceiling);
     container.children?.push(floor);
 
     return container;
