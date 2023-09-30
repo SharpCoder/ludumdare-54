@@ -54,7 +54,7 @@ const default3DFragmentShader = `
 
 
         if (u_showtex) {
-            gl_FragColor = mix( texture2D(u_texture, v_texcoord), u_fogColor, fogAmount);
+            gl_FragColor = mix(texture2D(u_texture, v_texcoord), u_fogColor, fogAmount);
         } else {
             gl_FragColor = v_color;
         }

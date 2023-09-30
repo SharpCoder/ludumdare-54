@@ -1,6 +1,6 @@
 import { type bbox, type Drawable, m4 } from 'webgl-engine';
 
-export function computePositionMatrix(obj: Obj3d): number[] {
+export function computePositionMatrix(obj: Drawable): number[] {
     // Calculate the position of all the vertexes for
     // this object.
     const scaleX = obj.scale?.[0] ?? 1.0;
@@ -84,4 +84,28 @@ export function computeBbox(obj: Drawable): bbox {
         h: bboxMatrix[13],
         d: bboxMatrix[14],
     };
+}
+
+export function computeDimensions(vertexes: number[]) {
+    const min = [Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE];
+    const max = [-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE];
+
+    // Calculate the bounding box based on the vertexes
+    for (let r = 0; r < vertexes.length / 3; r += 1) {
+        for (let i = 0; i < 3; i++) {
+            const axis = vertexes[r * 3 + i];
+            if (min[i] > axis) {
+                min[i] = axis;
+            }
+            if (max[i] < axis) {
+                max[i] = axis;
+            }
+        }
+    }
+
+    const width = max[0] - min[0];
+    const height = max[1] - min[1];
+    const depth = max[2] - min[2];
+
+    return [width, height, depth];
 }

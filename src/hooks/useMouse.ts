@@ -52,7 +52,6 @@ export function useMouse(engine: Engine<unknown>) {
     }
 
     // Create a matrix
-    const cameraMatrix = camera.getMatrix();
     const matrix = m4.combine([
         m4.rotateZ(camera.rotation[2]),
         m4.rotateY(camera.rotation[1]),
@@ -70,7 +69,7 @@ export function useMouse(engine: Engine<unknown>) {
         x: nextX,
         y: nextY,
         z: nextZ,
-        radius: 10,
+        radius: 50,
     };
 
     for (const obj of engine.activeScene.objects) {

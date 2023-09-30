@@ -7,9 +7,9 @@ import {
     Flatten,
     Repeat,
     Repeat2D,
+    loadModel,
 } from 'webgl-engine';
-import { computeBbox } from './math';
-import { rect2D } from 'webgl-engine';
+import { computeBbox, computeDimensions } from './math';
 import { tex2D } from 'webgl-engine';
 
 export type Doorway = 'N' | 'S' | 'E' | 'W';
@@ -40,6 +40,9 @@ export function createRoom(def: RoomDef) {
         position: [def.x, 0, def.z],
         rotation: zeros(),
         allowClipping: true,
+        properties: {
+            def,
+        },
         children: [],
     };
 
@@ -74,55 +77,54 @@ export function createRoom(def: RoomDef) {
     ];
 
     for (const segment of segments) {
-        const texcoord_w = segment.w / 128;
-        const texcoord_h = (def.ceiling / 128) * 1.5;
+        const texcoord_w = segment.w / 512 / 4;
+        const texcoord_h = def.ceiling / 512 / 4;
+        const texcoords = Flatten(Repeat(tex2D(texcoord_w, texcoord_h), 6));
+        const texcoords_half = Flatten(
+            Repeat(tex2D(texcoord_w / 2, texcoord_h), 6)
+        );
 
         const wallSegment: Partial<Drawable> = {
             colors: Flatten(Repeat(colors[idx % (colors.length - 1)], 36)),
             computeBbox: true,
             texture: {
-                repeat_horizontal: 'mirrored_repeat',
-                repeat_vertical: 'mirrored_repeat',
-                uri: './assets/brick.png',
+                repeat_horizontal: 'repeat',
+                repeat_vertical: 'repeat',
+                uri: './assets/stone.png',
                 enabled: true,
             },
-            allowClipping: true,
         };
 
         r += segment.r;
         const fakeWall: Drawable = {
-            name: uuidv4(),
+            name: `${segment.w}_${segment.gap}_main`,
             vertexes: cuboid(segment.w, def.ceiling, 1),
             offsets: [-segment.w, 0, 0],
             position: [x, y, z],
             rotation: [0, rads(r), 0],
             ...wallSegment,
-            texcoords: Flatten(Repeat(tex2D(texcoord_w, texcoord_h), 6)),
+            texcoords,
         };
 
         // Compute the children.
         if (segment.gap) {
             const left: Drawable = {
-                name: uuidv4(),
+                name: `${segment.w}_${segment.gap}_left`,
                 vertexes: cuboid((segment.w - segment.gap) / 2, def.ceiling, 1),
                 offsets: [-segment.w, 0, 0],
                 position: [x, y, z],
                 rotation: [0, rads(r), 0],
                 ...wallSegment,
-                texcoords: Flatten(
-                    Repeat(tex2D(texcoord_w / 2, texcoord_h), 6)
-                ),
+                texcoords: texcoords_half,
             };
             const right: Drawable = {
-                name: uuidv4(),
+                name: `${segment.w}_${segment.gap}_right`,
                 vertexes: cuboid((segment.w - segment.gap) / 2, def.ceiling, 1),
                 offsets: [-(segment.w - segment.gap) / 2, 0, 0],
                 position: [x, y, z],
                 rotation: [0, rads(r), 0],
                 ...wallSegment,
-                texcoords: Flatten(
-                    Repeat(tex2D(texcoord_w / 2, texcoord_h), 6)
-                ),
+                texcoords: texcoords_half,
             };
 
             container.children?.push(left);
@@ -148,8 +150,8 @@ export function createRoom(def: RoomDef) {
         position: [0, 0, 0],
         rotation: zeros(),
         texture: {
-            repeat_horizontal: 'mirrored_repeat',
-            repeat_vertical: 'mirrored_repeat',
+            repeat_horizontal: 'repeat',
+            repeat_vertical: 'repeat',
             uri: './assets/floor-tile.png',
             enabled: true,
         },
@@ -162,8 +164,8 @@ export function createRoom(def: RoomDef) {
 }
 
 export function loadMap(map: number[][]) {
-    const ROOM_DEPTH = 2500;
-    const ROOM_WIDTH = 2500;
+    const ROOM_DEPTH = 1000;
+    const ROOM_WIDTH = 1000;
     const roomList = [];
 
     for (let y = 0; y < map.length; y++) {
@@ -196,4 +198,50 @@ export function loadMap(map: number[][]) {
     }
 
     return roomList;
+}
+
+export function populateRoom(def: RoomDef) {
+    return new Promise<Drawable>((resolve) => {
+        loadModel('./assets/table.obj', 'obj', true).then((table) => {
+            loadModel('./assets/paper.obj', 'obj', true).then((paper) => {
+                const [paperW, paperH, paperD] = computeDimensions(
+                    paper.vertexes
+                );
+                const [tableW, tableH, tableD] = computeDimensions(
+                    table.vertexes
+                );
+
+                const container: Drawable = {
+                    name: 'room_populus',
+                    vertexes: [],
+                    offsets: [0, 0, -def.w / 2 + 100],
+                    position: [def.x, 0, def.z],
+                    rotation: zeros(),
+                    children: [],
+                };
+
+                container.children?.push({
+                    name: 'table',
+                    ...table,
+                    position: zeros(),
+                    rotation: zeros(),
+                    offsets: [-tableW / 2, -tableH / 2, -tableD / 2],
+                    scale: [200, 200, 200],
+                    computeBbox: true,
+                });
+
+                container.children?.push({
+                    name: 'note',
+                    ...paper,
+                    position: [0, -tableH * 200, 0],
+                    rotation: [0, rads(90), 0],
+                    offsets: [-paperW / 2, -paperH / 2, -paperD / 2],
+                    scale: [25, 25, 25],
+                    computeBbox: true,
+                });
+
+                resolve(container);
+            });
+        });
+    });
 }
