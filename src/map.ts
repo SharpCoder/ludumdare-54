@@ -1,5 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
-import { zeros, type Drawable, cuboid, rads } from 'webgl-engine';
+import {
+    zeros,
+    type Drawable,
+    cuboid,
+    rads,
+    Flatten,
+    Repeat,
+} from 'webgl-engine';
 import { computeBbox } from './math';
 
 export type Doorway = 'N' | 'S' | 'E' | 'W';
@@ -11,6 +18,15 @@ export type RoomDef = {
     doorways: Doorway[];
 };
 
+const colors = [
+    [253, 231, 37],
+    [122, 209, 81],
+    [34, 168, 132],
+    [42, 120, 142],
+    [65, 68, 135],
+    [68, 1, 84],
+];
+
 export function createRoom(def: RoomDef) {
     const container: Drawable = {
         name: 'room',
@@ -18,6 +34,7 @@ export function createRoom(def: RoomDef) {
         offsets: [def.w / 2, 0, -def.h / 2],
         position: zeros(),
         rotation: zeros(),
+        allowClipping: true,
         children: [],
     };
 
@@ -56,26 +73,32 @@ export function createRoom(def: RoomDef) {
         const fakeWall: Drawable = {
             name: uuidv4(),
             vertexes: cuboid(segment.w, 450, 1),
+            colors: Flatten(Repeat(colors[idx % (colors.length - 1)], 36)),
             offsets: [-segment.w, 0, 0],
             position: [x, y, z],
             rotation: [0, rads(r), 0],
+            computeBbox: true,
         };
 
         // Compute the children.
         if (segment.gap) {
             const left: Drawable = {
                 name: uuidv4(),
+                colors: Flatten(Repeat(colors[idx % (colors.length - 1)], 36)),
                 vertexes: cuboid((segment.w - segment.gap) / 2, 450, 1),
                 offsets: [-segment.w, 0, 0],
                 position: [x, y, z],
                 rotation: [0, rads(r), 0],
+                computeBbox: true,
             };
             const right: Drawable = {
                 name: uuidv4(),
+                colors: Flatten(Repeat(colors[idx % (colors.length - 1)], 36)),
                 vertexes: cuboid((segment.w - segment.gap) / 2, 450, 1),
                 offsets: [-(segment.w - segment.gap) / 2, 0, 0],
                 position: [x, y, z],
                 rotation: [0, rads(r), 0],
+                computeBbox: true,
             };
 
             container.children?.push(left);

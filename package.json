@@ -21,6 +21,6 @@
     "dependencies": {
         "@types/uuid": "^9.0.4",
         "uuid": "^9.0.1",
-        "webgl-engine": "git+git@github.com:SharpCoder/webgl-engine.git"
+        "webgl-engine": "../webgl-engine"
     }
 }

@@ -10,12 +10,12 @@ specifiers:
   typescript: ^5.0.2
   uuid: ^9.0.1
   vite: ^4.4.5
-  webgl-engine: git+git@github.com:SharpCoder/webgl-engine.git
+  webgl-engine: ../webgl-engine
 
 dependencies:
   '@types/uuid': 9.0.4
   uuid: 9.0.1
-  webgl-engine: github.com/SharpCoder/webgl-engine/ae54ccb8bb5dcc19dbe3172177138180209fb95b
+  webgl-engine: link:../webgl-engine
 
 devDependencies:
   '@sveltejs/vite-plugin-svelte': 2.4.6_svelte@4.2.1+vite@4.4.9
@@ -985,9 +985,3 @@ packages:
   /wrappy/1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
     dev: true
-
-  github.com/SharpCoder/webgl-engine/ae54ccb8bb5dcc19dbe3172177138180209fb95b:
-    resolution: {tarball: https://codeload.github.com/SharpCoder/webgl-engine/tar.gz/ae54ccb8bb5dcc19dbe3172177138180209fb95b}
-    name: webgl-engine
-    version: 1.0.4
-    dev: false

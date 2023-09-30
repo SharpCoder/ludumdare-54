@@ -1,4 +1,9 @@
-import type { Engine } from 'webgl-engine';
+import {
+    m4,
+    type Engine,
+    type Sphere,
+    sphereRectCollision,
+} from 'webgl-engine';
 
 const MAX_VEL = 12.0;
 let vx = 0.0,
@@ -19,9 +24,9 @@ export function useMouse(engine: Engine<unknown>) {
     camera.rotation[0] = Math.max(Math.PI * (my / hy), -Math.PI / 8);
 
     if (engine.keymap['w']) {
-        vy = Math.min(vy + 2.8, MAX_VEL);
-    } else if (engine.keymap['s']) {
         vy = Math.max(vy - 2.8, -MAX_VEL);
+    } else if (engine.keymap['s']) {
+        vy = Math.min(vy + 2.8, MAX_VEL);
     }
 
     if (engine.keymap['d']) {
@@ -46,6 +51,45 @@ export function useMouse(engine: Engine<unknown>) {
         vx = 0;
     }
 
-    camera.position[0] += vx;
-    camera.position[2] += vy;
+    // Create a matrix
+    const cameraMatrix = camera.getMatrix();
+    const matrix = m4.combine([
+        m4.rotateZ(camera.rotation[2]),
+        m4.rotateY(camera.rotation[1]),
+        m4.rotateX(camera.rotation[0]),
+        m4.translate(vx, 0, vy),
+    ]);
+
+    const nextX = camera.position[0] + matrix[12];
+    const nextY = camera.position[1];
+    const nextZ = camera.position[2] - matrix[14];
+
+    // Check if we are colliding with anything.
+    let collision = false;
+    const cameraSphere: Sphere = {
+        x: nextX,
+        y: nextY,
+        z: nextZ,
+        radius: 10,
+    };
+
+    for (const obj of engine.activeScene.objects) {
+        if (obj.computeBbox && obj.allowClipping !== true && obj._bbox) {
+            const [isColliding, dist] = sphereRectCollision(
+                cameraSphere,
+                obj._bbox
+            );
+
+            if (isColliding) {
+                collision = true;
+                break;
+            }
+        }
+    }
+
+    if (!collision) {
+        camera.position[0] = nextX;
+        camera.position[1] = nextY;
+        camera.position[2] = nextZ;
+    }
 }
