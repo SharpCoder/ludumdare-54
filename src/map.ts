@@ -11,6 +11,7 @@ import {
 } from 'webgl-engine';
 import { computeBbox, computeDimensions } from './math';
 import { tex2D } from 'webgl-engine';
+import { getModel } from './models';
 
 export type Doorway = 'N' | 'S' | 'E' | 'W';
 export type RoomDef = {
@@ -202,46 +203,41 @@ export function loadMap(map: number[][]) {
 
 export function populateRoom(def: RoomDef) {
     return new Promise<Drawable>((resolve) => {
-        loadModel('./assets/table.obj', 'obj', true).then((table) => {
-            loadModel('./assets/paper.obj', 'obj', true).then((paper) => {
-                const [paperW, paperH, paperD] = computeDimensions(
-                    paper.vertexes
-                );
-                const [tableW, tableH, tableD] = computeDimensions(
-                    table.vertexes
-                );
+        const table = getModel('table.obj');
+        const paper = getModel('paper.obj');
 
-                const container: Drawable = {
-                    name: 'room_populus',
-                    vertexes: [],
-                    offsets: [0, 0, -def.w / 2 + 100],
-                    position: [def.x, 0, def.z],
-                    rotation: zeros(),
-                    children: [],
-                };
+        const [paperW, paperH, paperD] = computeDimensions(paper.vertexes);
+        const [tableW, tableH, tableD] = computeDimensions(table.vertexes);
 
-                container.children?.push({
-                    name: 'table',
-                    ...table,
-                    position: zeros(),
-                    rotation: zeros(),
-                    offsets: [-tableW / 2, -tableH / 2, -tableD / 2],
-                    scale: [200, 200, 200],
-                    computeBbox: true,
-                });
+        const container: Drawable = {
+            name: 'room_populus',
+            vertexes: [],
+            offsets: [0, 0, -def.w / 2 + 100],
+            position: [def.x, 0, def.z],
+            rotation: zeros(),
+            children: [],
+        };
 
-                container.children?.push({
-                    name: 'note',
-                    ...paper,
-                    position: [0, -tableH * 200, 0],
-                    rotation: [0, rads(90), 0],
-                    offsets: [-paperW / 2, -paperH / 2, -paperD / 2],
-                    scale: [25, 25, 25],
-                    computeBbox: true,
-                });
-
-                resolve(container);
-            });
+        container.children?.push({
+            name: 'table',
+            ...table,
+            position: zeros(),
+            rotation: zeros(),
+            offsets: [-tableW / 2, -tableH / 2, -tableD / 2],
+            scale: [200, 200, 200],
+            computeBbox: true,
         });
+
+        container.children?.push({
+            name: 'note',
+            ...paper,
+            position: [0, -tableH * 200, 0],
+            rotation: [0, rads(90), 0],
+            offsets: [-paperW / 2, -paperH / 2, -paperD / 2],
+            scale: [25, 25, 25],
+            computeBbox: true,
+        });
+
+        resolve(container);
     });
 }

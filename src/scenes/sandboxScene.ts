@@ -13,7 +13,40 @@ import { computeDimensions } from '../math';
 export const SandboxScene = new Scene<unknown>({
     title: 'Sandbox Scene',
     shaders: [DefaultShader],
-    once: (engine) => {},
+    once: (engine) => {
+        const map = [
+            [0, 0, 0, 0, 0],
+            [0, 1, 1, 1, 0],
+            [0, 0, 0, 1, 0],
+            [0, 0, 0, 1, 0],
+            [0, 0, 1, 1, 0],
+            [0, 1, 1, 0, 0],
+            [0, 1, 0, 1, 0],
+            [0, 1, 1, 1, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 1, 1, 1, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 1, 0, 0],
+        ];
+
+        // Populate the map
+        const roomList = loadMap(map);
+        for (const room of roomList) {
+            SandboxScene.addObject(room);
+        }
+
+        // Position the camera in the first room
+        const firstRoom = roomList[0];
+        SandboxScene.camera.position = [...firstRoom.position];
+
+        const { def } = firstRoom.properties as any;
+        if (def) {
+            populateRoom(def).then((objects) => {
+                SandboxScene.addObject(objects);
+            });
+        }
+    },
     update: (time, engine) => {
         useMouse(engine);
     },
@@ -29,36 +62,3 @@ export const SandboxScene = new Scene<unknown>({
     },
     status: 'ready',
 });
-
-const map = [
-    [0, 0, 0, 0, 0],
-    [0, 1, 1, 1, 0],
-    [0, 0, 0, 1, 0],
-    [0, 0, 0, 1, 0],
-    [0, 0, 1, 1, 0],
-    [0, 1, 1, 0, 0],
-    [0, 1, 0, 1, 0],
-    [0, 1, 1, 1, 0],
-    [0, 0, 1, 0, 0],
-    [0, 0, 1, 0, 0],
-    [0, 1, 1, 1, 0],
-    [0, 0, 1, 0, 0],
-    [0, 0, 1, 0, 0],
-];
-
-// Populate the map
-const roomList = loadMap(map);
-for (const room of roomList) {
-    SandboxScene.addObject(room);
-}
-
-// Position the camera in the first room
-const firstRoom = roomList[0];
-SandboxScene.camera.position = [...firstRoom.position];
-
-const { def } = firstRoom.properties as any;
-if (def) {
-    populateRoom(def).then((objects) => {
-        SandboxScene.addObject(objects);
-    });
-}

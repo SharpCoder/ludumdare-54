@@ -1,10 +1,10 @@
-import { loadModel, type Drawable } from 'webgl-engine';
+import { loadModel, type Drawable, type ParsedModel } from 'webgl-engine';
 
 const assetList = ['./assets/table.obj', './assets/paper.obj'];
-const models: Record<string, Partial<Drawable>> = {};
+const models: Record<string, ParsedModel> = {};
 
 function fileName(path: string): string {
-    return path.substring(path.lastIndexOf('/'));
+    return path.substring(path.lastIndexOf('/') + 1);
 }
 
 export function initializeModels() {
@@ -15,4 +15,8 @@ export function initializeModels() {
 
         resolve();
     });
+}
+
+export function getModel(name: string): ParsedModel {
+    return models[name];
 }
