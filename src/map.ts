@@ -14,6 +14,8 @@ import { tex2D } from 'webgl-engine';
 
 export type Doorway = 'N' | 'S' | 'E' | 'W';
 export type RoomDef = {
+    x: number;
+    z: number;
     w: number;
     h: number;
     ceiling: number;
@@ -35,7 +37,7 @@ export function createRoom(def: RoomDef) {
         name: 'room',
         vertexes: [],
         offsets: [def.w / 2, 0, -def.h / 2],
-        position: zeros(),
+        position: [def.x, 0, def.z],
         rotation: zeros(),
         allowClipping: true,
         children: [],
@@ -84,6 +86,7 @@ export function createRoom(def: RoomDef) {
                 uri: './assets/brick.png',
                 enabled: true,
             },
+            allowClipping: true,
         };
 
         r += segment.r;
@@ -156,4 +159,41 @@ export function createRoom(def: RoomDef) {
     container.children?.push(floor);
 
     return container;
+}
+
+export function loadMap(map: number[][]) {
+    const ROOM_DEPTH = 2500;
+    const ROOM_WIDTH = 2500;
+    const roomList = [];
+
+    for (let y = 0; y < map.length; y++) {
+        for (let x = 0; x < map[y].length; x++) {
+            const doorways: Doorway[] = [];
+            const Current = map[y][x] == 1;
+            const N = map[y + 1]?.[x] == 1;
+            const S = map[y - 1]?.[x] == 1;
+            const E = map[y]?.[x - 1] == 1;
+            const W = map[y]?.[x + 1] == 1;
+
+            if (N) doorways.push('N');
+            if (S) doorways.push('S');
+            if (E) doorways.push('E');
+            if (W) doorways.push('W');
+
+            if (Current)
+                roomList.push(
+                    createRoom({
+                        x: x * ROOM_WIDTH,
+                        z: y * ROOM_DEPTH,
+                        h: ROOM_WIDTH - 2,
+                        w: ROOM_DEPTH - 2,
+                        ceiling: 1600,
+                        doorWidth: 500 - 25 * y,
+                        doorways: doorways,
+                    })
+                );
+        }
+    }
+
+    return roomList;
 }

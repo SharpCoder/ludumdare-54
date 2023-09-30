@@ -1,6 +1,6 @@
 import { Scene } from 'webgl-engine';
 import { useMouse } from '../hooks/useMouse';
-import { createRoom, type RoomDef } from '../map';
+import { createRoom, loadMap, type Doorway, type RoomDef } from '../map';
 import { DefaultShader } from '../shaders/default';
 
 export const SandboxScene = new Scene<unknown>({
@@ -21,13 +21,32 @@ export const SandboxScene = new Scene<unknown>({
     status: 'initializing',
 });
 
-const MainRoom: RoomDef = {
-    w: 1500,
-    h: 1500,
-    ceiling: 1600,
-    doorWidth: 500,
-    doorways: ['S'],
-};
+const map = [
+    [0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 0],
+    [0, 0, 0, 1, 0],
+    [0, 0, 0, 1, 0],
+    [0, 0, 1, 1, 0],
+    [0, 1, 1, 0, 0],
+    [0, 1, 0, 1, 0],
+    [0, 1, 1, 1, 0],
+    [0, 0, 1, 0, 0],
+    [0, 0, 1, 0, 0],
+    [0, 1, 1, 1, 0],
+    [0, 0, 1, 0, 0],
+    [0, 0, 1, 0, 0],
+];
 
-SandboxScene.addObject(createRoom(MainRoom));
+// Populate the map
+const roomList = loadMap(map);
+for (const room of roomList) {
+    SandboxScene.addObject(room);
+}
+
+// Position the camera in the first room
+const firstRoom = roomList[0];
+SandboxScene.camera.position = [...firstRoom.position];
+
+console.log(roomList);
+
 SandboxScene.status = 'ready';
