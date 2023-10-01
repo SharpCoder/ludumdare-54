@@ -6,6 +6,7 @@ const assetList = [
     './assets/keypad.obj',
     './assets/tree.obj',
     './assets/pillar.obj',
+    './assets/flashlight.obj',
 ];
 const models: Record<string, ParsedModel> = {};
 

@@ -6,6 +6,7 @@ import {
     rads,
     Flatten,
     Repeat,
+    cuboidNormals,
 } from 'webgl-engine';
 import { computeBbox, computeDimensions } from './math';
 import { tex2D } from 'webgl-engine';
@@ -32,7 +33,7 @@ const colors = [
 ];
 
 export function createRoom(def: RoomDef) {
-    const godmode = false;
+    const godmode = true;
 
     const container: Drawable = {
         name: 'room',
@@ -101,6 +102,7 @@ export function createRoom(def: RoomDef) {
         const fakeWall: Drawable = {
             name: `${segment.w}_${segment.gap}_main`,
             vertexes: cuboid(segment.w, def.ceiling, 0),
+            normals: cuboidNormals(),
             offsets: [-segment.w, 0, 0],
             position: [x, y, z],
             rotation: [0, rads(r), 0],
@@ -113,6 +115,7 @@ export function createRoom(def: RoomDef) {
             const left: Drawable = {
                 name: `${segment.w}_${segment.gap}_left`,
                 vertexes: cuboid((segment.w - segment.gap) / 2, def.ceiling, 1),
+                normals: cuboidNormals(),
                 offsets: [-segment.w, 0, 0],
                 position: [x, y, z],
                 rotation: [0, rads(r), 0],
@@ -122,6 +125,7 @@ export function createRoom(def: RoomDef) {
             const right: Drawable = {
                 name: `${segment.w}_${segment.gap}_right`,
                 vertexes: cuboid((segment.w - segment.gap) / 2, def.ceiling, 1),
+                normals: cuboidNormals(),
                 offsets: [-(segment.w - segment.gap) / 2, 0, 0],
                 position: [x, y, z],
                 rotation: [0, rads(r), 0],
@@ -147,6 +151,7 @@ export function createRoom(def: RoomDef) {
     const floor: Drawable = {
         name: `floor_${def.w}_${def.h}`,
         vertexes: cuboid(def.w, 1, def.h),
+        normals: cuboidNormals(),
         offsets: [-def.w, 0, 0],
         position: [0, 0, 0],
         rotation: zeros(),
@@ -163,6 +168,7 @@ export function createRoom(def: RoomDef) {
     const ceiling: Drawable = {
         name: `floor_${def.w}_${def.h}`,
         vertexes: cuboid(def.w, 1, def.h),
+        normals: cuboidNormals(),
         offsets: [-def.w, def.ceiling, 0],
         position: [0, 0, 0],
         rotation: zeros(),
@@ -175,17 +181,6 @@ export function createRoom(def: RoomDef) {
         texcoords: Flatten(Repeat(tex2D(brick_w, brick_h), 6)),
     };
 
-    // Add a roof
-    const roof: Drawable = {
-        name: 'roof',
-        vertexes: cuboid(def.w, 50, def.h),
-        offsets: [-def.w, def.ceiling, 0],
-        position: zeros(),
-        rotation: zeros(),
-        colors: Flatten(Repeat([28, 28, 28], 36)),
-    };
-
-    container.children?.push(roof);
     container.children?.push(floor);
     container.children?.push(ceiling);
 

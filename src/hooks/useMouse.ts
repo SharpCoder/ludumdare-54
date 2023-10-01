@@ -24,7 +24,7 @@ export function useMouse(engine: Engine<GameProps>) {
     const my = hy - engine.mousey;
 
     camera.rotation[1] = 2 * Math.PI * (mx / hx);
-    camera.rotation[0] = Math.max(Math.PI * (my / hy), -Math.PI / 8);
+    // camera.rotation[0] = Math.max(Math.PI * (my / hy), 0);
 
     if (engine.keymap['w']) {
         vy = Math.max(vy - 2.8, -MAX_VEL);

@@ -4,6 +4,7 @@ import { loadMap, type RoomDef } from '../map';
 import { DefaultShader } from '../shaders/default';
 import { spawnClue } from '../objects/clue';
 import { spawnKeypad } from '../objects/keypad';
+import { spawnFlashlight } from '../objects/flashlight';
 
 export const SandboxScene = new Scene<unknown>({
     title: 'Sandbox Scene',
@@ -36,6 +37,10 @@ export const SandboxScene = new Scene<unknown>({
         SandboxScene.camera.position = [...firstRoom.position];
 
         const { def } = firstRoom.properties as { def: RoomDef };
+
+        // @ts-ignore
+        engine.properties['def'] = def;
+
         if (def) {
             const clue = spawnClue({
                 x: firstRoom.position[0],
@@ -54,6 +59,8 @@ export const SandboxScene = new Scene<unknown>({
             keypad.offsets[1] = 300;
             SandboxScene.addObject(keypad);
         }
+
+        SandboxScene.addObject(spawnFlashlight());
     },
     update: (time, engine) => {
         const { gl } = engine;
