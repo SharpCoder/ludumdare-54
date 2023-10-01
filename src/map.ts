@@ -7,12 +7,19 @@ import {
     Flatten,
     Repeat,
     cuboidNormals,
+    Scene,
 } from 'webgl-engine';
 import { computeBbox } from './math';
 import { tex2D } from 'webgl-engine';
+import type { GameProps } from './main';
+import { spawnVase } from './objects/vase';
+import { spawnBookshelf } from './objects/bookshelf';
+import { spawnClue } from './objects/clue';
+import { spawnKeypad } from './objects/keypad';
 
 export type Doorway = 'N' | 'S' | 'E' | 'W';
 export type RoomDef = {
+    type: number;
     x: number;
     z: number;
     w: number;
@@ -200,14 +207,61 @@ export function createRoom(def: RoomDef) {
     container.children?.push(floor);
     container.children?.push(ceiling);
 
+    // Populate room
+    for (const el of populateRoom(def)) {
+        container.children?.push(el);
+    }
+
     return container;
+}
+
+function populateRoom(def: RoomDef): Drawable[] {
+    const elements: Drawable[] = [];
+    const mod1 = Math.random() > 0.5 ? 1.0 : -1.0;
+    const mod2 = Math.random() > 0.5 ? 1.0 : -1.0;
+    const offset = def.w / 2 - def.w * def.crushFactor;
+
+    if (def.type === 1) {
+        // Puzzle room 1
+        elements.push(
+            spawnClue({
+                x: -def.w / 2,
+                z: -def.h / 2 - 700,
+                text: 'uryyb',
+            })
+        );
+
+        elements.push(spawnKeypad({ x: 0, z: -def.h / 2 - def.h / 6 }));
+    } else if (def.type === 2) {
+        // Vase room
+        elements.push(
+            spawnVase({
+                x: -def.w / 2 - (offset - 50) * mod2,
+                z: -def.h / 2 - (offset - 50) * mod1,
+            })
+        );
+    } else if (def.type === 3) {
+        // Bookshelf room
+        elements.push(
+            spawnBookshelf({
+                x: -def.w / 2,
+                z: -def.h / 2 - offset * mod1,
+            })
+        );
+    }
+
+    return elements;
 }
 
 export type MapProps = {
     x: number;
     z: number;
 };
-export function loadMap(props: MapProps, map: number[][]) {
+export function loadMap(
+    scene: Scene<GameProps>,
+    props: MapProps,
+    map: number[][]
+) {
     const ROOM_DEPTH = 2000;
     const ROOM_WIDTH = 2000;
     const roomList = [];
@@ -216,25 +270,26 @@ export function loadMap(props: MapProps, map: number[][]) {
     for (let y = 0; y < map.length; y++) {
         for (let x = 0; x < map[y].length; x++) {
             const doorways: Doorway[] = [];
-            const Current = map[y][x] == 1;
-            const N = map[y + 1]?.[x] == 1;
-            const S = map[y - 1]?.[x] == 1;
-            const E = map[y]?.[x - 1] == 1;
-            const W = map[y]?.[x + 1] == 1;
+            const current = map[y][x] != 0;
+            const N = map[y + 1]?.[x] != 0;
+            const S = map[y - 1]?.[x] != 0;
+            const E = map[y]?.[x - 1] != 0;
+            const W = map[y]?.[x + 1] != 0;
 
             if (N || first) doorways.push('N');
             if (S) doorways.push('S');
             if (E) doorways.push('E');
             if (W) doorways.push('W');
 
-            if (Current)
+            if (current)
                 roomList.push(
                     createRoom({
+                        type: map[y][x],
                         x: props.x + x * ROOM_WIDTH,
                         z: props.z + y * ROOM_DEPTH,
                         h: ROOM_WIDTH,
                         w: ROOM_DEPTH,
-                        ceiling: 1600,
+                        ceiling: 600,
                         doorWidth: 450 - 25 * y,
                         crushFactor: y / 1.5 / map.length,
                         doorways: doorways,

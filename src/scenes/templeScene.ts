@@ -31,7 +31,7 @@ export const TempleScene = new Scene<unknown>({
         ];
 
         // Populate the map
-        const roomList = loadMap({ x: 0, z: 0 }, map);
+        const roomList = loadMap(TempleScene, { x: 0, z: 0 }, map);
         for (const room of roomList) {
             TempleScene.addObject(room);
         }

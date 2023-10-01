@@ -43,7 +43,9 @@ export function spawnClue(def: ClueDef) {
         scale: [25, 25, 25],
         update: function (time, engine) {
             // Calculate distance
-            const dist = distanceToCamera(engine, def.x, def.z);
+            const x = this._computed?.positionMatrix?.[12] ?? 0;
+            const z = this._computed?.positionMatrix?.[14] ?? 0;
+            const dist = distanceToCamera(engine, x, -z);
 
             if (dist < 300) {
                 updateText(engine, def.text);

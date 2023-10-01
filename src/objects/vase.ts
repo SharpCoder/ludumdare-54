@@ -26,7 +26,7 @@ export function spawnVase(def: VaseDef) {
         ...vase,
         position: zeros(),
         rotation: [rads(0), rads(90), rads(0)],
-        offsets: [-w / 2, -h / 2, -d / 2],
+        offsets: [-w / 2, 50, -d / 2],
         scale: [300, 300, 300],
     });
 

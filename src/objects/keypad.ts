@@ -26,11 +26,14 @@ export function spawnKeypad(def: KeypadDef) {
         ...keypad,
         position: zeros(),
         rotation: [rads(0), rads(180), rads(0)],
-        offsets: [-w / 2, -h / 2, -d / 2],
+        offsets: [-w / 2, 300, -d / 2],
         scale: [40, 40, 40],
         update: function (time, engine) {
-            const x = def.x - w / 2;
-            const z = def.z - d / 2;
+            const px = this._computed?.positionMatrix?.[12] ?? 0;
+            const pz = this._computed?.positionMatrix?.[14] ?? 0;
+
+            const x = px - w / 2;
+            const z = -pz - d / 2;
             const dist = distanceToCamera(engine, x, z);
             const msg = 'Press space to enter the code';
 

@@ -6,7 +6,8 @@ import {
 } from 'webgl-engine';
 import type { GameProps } from '../main';
 
-const MAX_VEL = 12.0;
+const ACCEL = 5;
+const MAX_VEL = 18.0;
 let vx = 0.0,
     vy = 0.0;
 
@@ -27,15 +28,15 @@ export function useMouse(engine: Engine<GameProps>) {
     // camera.rotation[0] = Math.max(Math.PI * (my / hy), 0);
 
     if (engine.keymap['w']) {
-        vy = Math.max(vy - 2.8, -MAX_VEL);
+        vy = Math.max(vy - ACCEL, -MAX_VEL);
     } else if (engine.keymap['s']) {
-        vy = Math.min(vy + 2.8, MAX_VEL);
+        vy = Math.min(vy + ACCEL, MAX_VEL);
     }
 
     if (engine.keymap['d']) {
-        vx = Math.min(vx + 2.8, MAX_VEL);
+        vx = Math.min(vx + ACCEL, MAX_VEL);
     } else if (engine.keymap['a']) {
-        vx = Math.max(vx - 2.8, -MAX_VEL);
+        vx = Math.max(vx - ACCEL, -MAX_VEL);
     }
 
     if (vy > 1.5) {
