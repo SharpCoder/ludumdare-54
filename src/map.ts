@@ -17,6 +17,8 @@ export type RoomDef = {
     z: number;
     w: number;
     h: number;
+    // 0 - 1
+    crushFactor: number;
     ceiling: number;
     doorWidth: number;
     doorways: Doorway[];
@@ -78,6 +80,7 @@ export function createRoom(def: RoomDef) {
     ];
 
     for (const segment of segments) {
+        const crushy = segment.w * def.crushFactor;
         const texcoord_w = segment.w / 512 / 4;
         const texcoord_h = def.ceiling / 512 / 4;
         const texcoords = Flatten(Repeat(tex2D(texcoord_w, texcoord_h), 6));
@@ -135,7 +138,21 @@ export function createRoom(def: RoomDef) {
             container.children?.push(left);
             container.children?.push(right);
         } else {
-            container.children?.push(fakeWall);
+            // container.children?.push(fakeWall);
+
+            // Calculate the crush segments
+            const crushSegment: Drawable = {
+                name: `${segment.w}_${segment.gap}_crush`,
+                vertexes: cuboid(segment.w, def.ceiling, 1),
+                normals: cuboidNormals(),
+                offsets: [-segment.w, 0, crushy],
+                position: [x, y, z],
+                rotation: [0, rads(r), 0],
+                ...wallSegment,
+                texcoords,
+            };
+
+            container.children?.push(crushSegment);
         }
 
         const bbox = computeBbox(fakeWall);
@@ -218,7 +235,8 @@ export function loadMap(props: MapProps, map: number[][]) {
                         h: ROOM_WIDTH,
                         w: ROOM_DEPTH,
                         ceiling: 1600,
-                        doorWidth: 450,
+                        doorWidth: 450 - 25 * y,
+                        crushFactor: y / 1.5 / map.length,
                         doorways: doorways,
                     })
                 );

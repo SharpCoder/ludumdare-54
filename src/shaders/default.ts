@@ -72,7 +72,7 @@ const default3DFragmentShader = `
     void main() {
 
         // fog
-        float fogDistance = length(v_position) / 100.0;
+        float fogDistance = length(v_position) / 150.0;
         float fogAmount = 1.0 - exp2(-u_fogDensity * u_fogDensity * fogDistance * fogDistance * LOG2);
         fogAmount = clamp(fogAmount, 0.1, 1.0);
 
