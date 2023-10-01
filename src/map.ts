@@ -8,9 +8,8 @@ import {
     Repeat,
     cuboidNormals,
 } from 'webgl-engine';
-import { computeBbox, computeDimensions } from './math';
+import { computeBbox } from './math';
 import { tex2D } from 'webgl-engine';
-import { getModel } from './models';
 
 export type Doorway = 'N' | 'S' | 'E' | 'W';
 export type RoomDef = {
@@ -33,7 +32,7 @@ const colors = [
 ];
 
 export function createRoom(def: RoomDef) {
-    const godmode = true;
+    const godmode = false;
 
     const container: Drawable = {
         name: 'room',
@@ -218,7 +217,7 @@ export function loadMap(props: MapProps, map: number[][]) {
                         z: props.z + y * ROOM_DEPTH,
                         h: ROOM_WIDTH,
                         w: ROOM_DEPTH,
-                        ceiling: 600,
+                        ceiling: 1600,
                         doorWidth: 450,
                         doorways: doorways,
                     })

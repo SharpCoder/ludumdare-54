@@ -65,34 +65,32 @@ const default3DFragmentShader = `
     uniform float u_fogDensity;
 
     // Light
-    uniform float u_lightLimit;
+    uniform float u_innerLightLimit;
+    uniform float u_outerLightLimit;
     uniform vec3 u_lightDirection;
     
     void main() {
 
+        // fog
         float fogDistance = length(v_position) / 100.0;
         float fogAmount = 1.0 - exp2(-u_fogDensity * u_fogDensity * fogDistance * fogDistance * LOG2);
         fogAmount = clamp(fogAmount, 0.1, 1.0);
 
+        // lighting
+        vec3 normal = normalize(v_normal);
+        vec3 surfaceToLightDirection = normalize(v_surfaceToLight);
+        float dotFromDirection = dot(surfaceToLightDirection, -u_lightDirection);
+        float lightMod = smoothstep(u_outerLightLimit, u_innerLightLimit, dotFromDirection);
+        float light = lightMod * dot(normal, surfaceToLightDirection);
+        
         if (u_showtex) {
-            // gl_FragColor = mix(texture2D(u_texture, v_texcoord), u_fogColor, fogAmount);
-            gl_FragColor = texture2D(u_texture, v_texcoord);
+            gl_FragColor = mix(texture2D(u_texture, v_texcoord), u_fogColor, fogAmount);
         } else {
             gl_FragColor = v_color;
         }
 
-        vec3 normal = normalize(v_normal);
-        vec3 surfaceToLightDirection = normalize(v_surfaceToLight);
-        float dotFromDirection = dot(surfaceToLightDirection, -u_lightDirection);
-        float light = 0.1;
-
-        if (dotFromDirection >= u_lightLimit) {
-            light = dot(normal, surfaceToLightDirection);
-        } 
-        
         gl_FragColor.rgb *= clamp(light, 0.0, 1.0);
         
-
         if (u_transparent) {
             gl_FragColor[3] = 0.0;
         } 
@@ -154,9 +152,13 @@ export const DefaultShader: ProgramTemplate = {
         },
     },
     staticUniforms: {
-        u_lightLimit: (engine, loc) => {
+        u_innerLightLimit: (engine, loc) => {
             const { gl } = engine;
-            gl.uniform1f(loc, Math.cos(rads(25)));
+            gl.uniform1f(loc, Math.cos(rads(15)));
+        },
+        u_outerLightLimit: (engine, loc) => {
+            const { gl } = engine;
+            gl.uniform1f(loc, Math.cos(rads(35)));
         },
         u_lightDirection: (engine, loc) => {
             const { gl } = engine;

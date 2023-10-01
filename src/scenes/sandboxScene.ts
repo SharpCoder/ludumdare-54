@@ -5,6 +5,7 @@ import { DefaultShader } from '../shaders/default';
 import { spawnClue } from '../objects/clue';
 import { spawnKeypad } from '../objects/keypad';
 import { spawnFlashlight } from '../objects/flashlight';
+import { spawnBookshelf } from '../objects/bookshelf';
 
 export const SandboxScene = new Scene<unknown>({
     title: 'Sandbox Scene',
@@ -61,6 +62,12 @@ export const SandboxScene = new Scene<unknown>({
         }
 
         SandboxScene.addObject(spawnFlashlight());
+        SandboxScene.addObject(
+            spawnBookshelf({
+                x: firstRoom.position[0],
+                z: firstRoom.position[2] + 900,
+            })
+        );
     },
     update: (time, engine) => {
         const { gl } = engine;
